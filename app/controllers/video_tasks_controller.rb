@@ -8,6 +8,11 @@ class VideoTasksController < ApplicationController
     @video_task = VideoTask.find(params[:id])
   end
 
+  def status
+    render partial: "video_tasks/status",
+      locals: { video_task: VideoTask.find(params[:id]) }
+  end
+
   def new
     @operation = Video::Registry.find!(params[:operation])
     @video_task = VideoTask.new(operation: @operation.key)
@@ -23,6 +28,7 @@ class VideoTasksController < ApplicationController
 
   def clear
     VideoTask.find_each { |task| task.purge_files && task.destroy }
+    ActiveStorage::Blob.unattached.find_each(&:purge)
     redirect_to root_path, notice: "Histórico limpo."
   end
 

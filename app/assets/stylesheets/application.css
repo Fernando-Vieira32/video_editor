@@ -138,16 +138,58 @@ a:hover { text-decoration: underline; }
   font-size: .85rem;
 }
 .btn--ghost:hover { background: var(--border); }
+.btn--accent {
+  background: rgba(79, 140, 255, .16);
+  color: var(--primary);
+  padding: .45rem .9rem;
+  font-size: .85rem;
+  margin-left: auto;
+}
+.btn--accent:hover { background: rgba(79, 140, 255, .28); }
 
 /* Trimmer / visual editor */
 .trimmer { display: flex; flex-direction: column; gap: 1rem; }
 .trimmer__stage { display: flex; flex-direction: column; gap: 1rem; }
+.trimmer__player { position: relative; line-height: 0; }
 .trimmer__video {
   width: 100%;
   max-height: 55vh;
   background: #000;
   border-radius: var(--radius);
 }
+.trimmer__preview-badge {
+  position: absolute;
+  top: .6rem;
+  left: .6rem;
+  display: none;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .65rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .7);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.trimmer--previewing .trimmer__preview-badge { display: inline-flex; }
+.trimmer--previewing .trimmer__video { outline: 2px solid var(--primary); outline-offset: -2px; }
+.trimmer--previewing .btn--accent { background: var(--primary); color: #fff; }
+.trimmer__hint { margin: 0; font-size: .8rem; color: var(--muted); }
+.trimmer__switch {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin-left: auto;
+  padding: .45rem .8rem;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: .85rem;
+  cursor: pointer;
+  user-select: none;
+}
+.trimmer__switch input { accent-color: var(--primary); cursor: pointer; }
+.trimmer--previewing .trimmer__switch { background: var(--primary); color: #fff; }
 .trimmer__controls {
   display: flex;
   flex-wrap: wrap;

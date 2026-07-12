@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :video_tasks, only: %i[index new create show] do
     delete :clear, on: :collection
+    get :status, on: :member
   end
 
   # Defines the root path route ("/")

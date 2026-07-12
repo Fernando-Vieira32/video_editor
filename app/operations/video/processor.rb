@@ -22,7 +22,7 @@ module Video
 
     def process(input_path)
       output = Tempfile.new([ "output", extension ])
-      finish(Ffmpeg::Runner.call(operation.command(input_path, output.path)), output)
+      finish(operation.call(input_path, output.path), output)
     ensure
       output&.close!
     end

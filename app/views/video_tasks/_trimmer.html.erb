@@ -8,17 +8,23 @@
   </div>
 
   <div class="trimmer__stage" data-video-trimmer-target="stage" hidden>
-    <video class="trimmer__video" data-video-trimmer-target="video" playsinline></video>
+    <div class="trimmer__player">
+      <video class="trimmer__video" data-video-trimmer-target="video" playsinline></video>
+      <span class="trimmer__preview-badge" data-video-trimmer-target="previewBadge">● PRÉVIA</span>
+    </div>
 
     <div class="trimmer__controls">
       <button type="button" class="btn btn--ghost" data-action="video-trimmer#togglePlay"
               data-video-trimmer-target="playButton">▶ Play</button>
       <button type="button" class="btn btn--ghost" data-action="video-trimmer#markIn">⟤ Marcar início</button>
       <button type="button" class="btn btn--ghost" data-action="video-trimmer#markOut">Marcar fim ⟥</button>
-      <label class="trimmer__preview">
-        <input type="checkbox" data-action="video-trimmer#togglePreview"> Preview do resultado
+      <label class="trimmer__switch">
+        <input type="checkbox" data-action="video-trimmer#togglePreview"
+               data-video-trimmer-target="previewToggle">
+        <span>👁 Prévia do corte</span>
       </label>
     </div>
+    <p class="trimmer__hint"><%= operation.preview_hint %></p>
 
     <div class="timeline" data-video-trimmer-target="timeline" data-action="click->video-trimmer#seek">
       <div class="timeline__filmstrip" data-video-trimmer-target="filmstrip"></div>

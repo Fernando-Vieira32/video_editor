@@ -1,10 +1,12 @@
-<%= turbo_stream_from @video_task %>
-
 <section class="form-header">
   <%= link_to "← Voltar", root_path, class: "back" %>
   <h1><%= @video_task.label %></h1>
 </section>
 
-<div id="video_task_status">
-  <%= render "video_tasks/status", video_task: @video_task %>
+<div data-controller="status-poller"
+     data-status-poller-url-value="<%= status_video_task_path(@video_task) %>"
+     data-status-poller-active-value="<%= !@video_task.finished? %>">
+  <div id="video_task_status" data-status-poller-target="status">
+    <%= render "video_tasks/status", video_task: @video_task %>
+  </div>
 </div>

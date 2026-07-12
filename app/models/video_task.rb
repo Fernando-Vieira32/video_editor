@@ -9,10 +9,10 @@ class VideoTask < ApplicationRecord
   validate :operation_params_valid
 
   after_create_commit :enqueue
-  after_update_commit :broadcast_status
 
   def operation_class = Video::Registry.find(operation)
   def label = operation_class&.label || operation
+  def finished? = completed? || failed?
 
   def purge_files
     [ source, result ].each { |file| file.purge if file.attached? }
@@ -27,9 +27,4 @@ class VideoTask < ApplicationRecord
   end
 
   def enqueue = VideoProcessingJob.perform_later(id)
-
-  def broadcast_status
-    broadcast_replace_to self, target: "video_task_status",
-      partial: "video_tasks/status", locals: { video_task: self }
-  end
 end

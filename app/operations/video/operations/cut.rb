@@ -6,6 +6,7 @@ module Video
       def self.description = "Corta um trecho entre dois tempos, sem recodificar."
       def self.icon = "✂️"
       def self.timeline? = true
+      def self.preview_hint = "A prévia reproduz apenas o trecho selecionado (o que será mantido)."
 
       def self.fields
         [

@@ -1,13 +1,18 @@
+require "tmpdir"
+
 module Video
   module Operations
     # Removes the marked segment (start..end) and joins the surrounding parts.
-    # Re-encodes because the join happens at non-keyframe boundaries.
+    # Uses stream copy (no re-encode): cuts the head (0..start) and tail
+    # (end..EOF) then concatenates them. Fast and light; cut points snap to the
+    # nearest keyframe.
     class RemoveSegment < Operation
       def self.label = "Remover trecho"
       def self.description = "Remove o pedaço marcado e junta o antes com o depois."
       def self.icon = "🗑️"
       def self.timeline? = true
       def self.timeline_mode = "remove"
+      def self.preview_hint = "A prévia reproduz o vídeo final, pulando o trecho vermelho."
 
       def self.fields
         [
@@ -18,8 +23,9 @@ module Video
         ]
       end
 
-      def command(input, output)
-        [ "-i", input, "-filter_complex", filtergraph(input), *maps(input), output ]
+      def call(input, output)
+        @input = input
+        Dir.mktmpdir { |dir| run_pipeline(output, dir) }
       end
 
       def validate
@@ -31,40 +37,27 @@ module Video
 
       private
 
+      def run_pipeline(output, dir)
+        head = File.join(dir, "head#{container_ext}")
+        tail = File.join(dir, "tail#{container_ext}")
+        result = Ffmpeg::Runner.call([ "-i", @input, "-to", raw_start, "-c", "copy", head ])
+        result.success? ? join(head, tail, output, dir) : result
+      end
+
+      def join(head, tail, output, dir)
+        result = Ffmpeg::Runner.call([ "-ss", raw_end, "-i", @input, "-c", "copy", tail ])
+        result.success? ? Ffmpeg::Runner.call(concat_args(head, tail, output, dir)) : result
+      end
+
+      def concat_args(head, tail, output, dir)
+        list = File.join(dir, "list.txt")
+        File.write(list, "file '#{head}'\nfile '#{tail}'\n")
+        [ "-f", "concat", "-safe", "0", "-i", list, "-c", "copy", output ]
+      end
+
+      def container_ext = File.extname(task.source.filename.to_s).presence || ".mp4"
       def raw_start = params["start"].presence || "00:00:00"
       def raw_end = params["end"].to_s
-      def audio?(input) = Ffmpeg::Probe.has_audio?(input)
-
-      def filtergraph(input)
-        audio?(input) ? "#{video_graph}#{audio_graph}#{concat(1)}" : "#{video_graph}#{concat(0)}"
-      end
-
-      def video_graph
-        "[0:v]trim=end=#{start_secs},setpts=PTS-STARTPTS[v0];" \
-          "[0:v]trim=start=#{end_secs},setpts=PTS-STARTPTS[v1];"
-      end
-
-      def audio_graph
-        "[0:a]atrim=end=#{start_secs},asetpts=PTS-STARTPTS[a0];" \
-          "[0:a]atrim=start=#{end_secs},asetpts=PTS-STARTPTS[a1];"
-      end
-
-      def concat(audio)
-        parts = audio.positive? ? "[v0][a0][v1][a1]" : "[v0][v1]"
-        "#{parts}concat=n=2:v=1:a=#{audio}[outv]#{'[outa]' if audio.positive?}"
-      end
-
-      def maps(input)
-        audio?(input) ? [ "-map", "[outv]", "-map", "[outa]" ] : [ "-map", "[outv]" ]
-      end
-
-      def start_secs = to_seconds(raw_start)
-      def end_secs = to_seconds(raw_end)
-
-      def to_seconds(time)
-        parts = time.split(":").map(&:to_f)
-        parts.reduce(0.0) { |acc, part| acc * 60 + part }
-      end
 
       def valid_time?(time)
         time.match?(/\A\d{1,2}:\d{2}:\d{2}(\.\d{1,3})?\z/) ||

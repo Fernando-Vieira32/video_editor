@@ -16,7 +16,15 @@ module Video
     # How the timeline preview treats the marked range: "keep" or "remove".
     def self.timeline_mode = "keep"
 
+    # Caption shown under the timeline explaining what the preview simulates.
+    def self.preview_hint = "A prévia reproduz o resultado da edição antes de aplicar."
+
     def initialize(task) = @task = task
+
+    # Runs the operation. Default runs a single FFmpeg command; operations that
+    # need several steps (split, concat, ...) override this. Returns an object
+    # responding to #success? and #output.
+    def call(input_path, output_path) = Ffmpeg::Runner.call(command(input_path, output_path))
 
     # Returns the FFmpeg arguments (without the leading 'ffmpeg -y').
     def command(_input_path, _output_path) = raise(NotImplementedError, "#{self.class} must define #command")

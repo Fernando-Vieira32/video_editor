@@ -7,7 +7,7 @@ export default class extends Controller {
   static targets = [
     "file", "stage", "video", "playButton", "timeline", "selection",
     "inHandle", "outHandle", "playhead", "inLabel", "outLabel",
-    "durationLabel", "startField", "endField", "filmstrip"
+    "durationLabel", "startField", "endField", "filmstrip", "previewToggle"
   ]
   static values = { mode: String }
 
@@ -135,12 +135,18 @@ export default class extends Controller {
   // --- playback --------------------------------------------------------------
 
   togglePlay() {
+    if (this.previewing && this.isRemoved(this.videoTarget.currentTime)) {
+      this.videoTarget.currentTime = this.previewStart()
+    }
     this.videoTarget.paused ? this.videoTarget.play() : this.videoTarget.pause()
   }
 
   togglePreview(event) {
     this.previewing = event.target.checked
-    if (this.previewing) this.videoTarget.currentTime = this.previewStart()
+    this.element.classList.toggle("trimmer--previewing", this.previewing)
+    if (this.previewing && this.isRemoved(this.videoTarget.currentTime)) {
+      this.videoTarget.currentTime = this.previewStart()
+    }
   }
 
   onTimeUpdate() {
@@ -152,9 +158,17 @@ export default class extends Controller {
     const t = this.videoTarget.currentTime
     if (this.modeValue === "remove" && t >= this.inTime && t < this.outTime) {
       this.videoTarget.currentTime = this.outTime
-    } else if (this.modeValue === "keep" && (t < this.inTime || t >= this.outTime)) {
+    } else if (this.modeValue === "keep" && t >= this.outTime) {
+      this.videoTarget.pause()
+    } else if (this.modeValue === "keep" && t < this.inTime) {
       this.videoTarget.currentTime = this.inTime
     }
+  }
+
+  isRemoved(t) {
+    return this.modeValue === "remove"
+      ? (t >= this.inTime && t < this.outTime)
+      : (t < this.inTime || t >= this.outTime)
   }
 
   previewStart() { return this.modeValue === "keep" ? this.inTime : 0 }

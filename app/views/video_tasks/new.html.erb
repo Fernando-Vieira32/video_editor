@@ -1,0 +1,34 @@
+<section class="form-header">
+  <%= link_to "← Voltar", root_path, class: "back" %>
+  <h1><%= @operation.icon %> <%= @operation.label %></h1>
+  <p><%= @operation.description %></p>
+</section>
+
+<%= form_with model: @video_task, url: video_tasks_path, class: "task-form" do |form| %>
+  <% if @video_task.errors.any? %>
+    <div class="errors">
+      <% @video_task.errors.full_messages.each do |message| %>
+        <p><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= form.hidden_field :operation, value: @operation.key %>
+
+  <% if @operation.timeline? %>
+    <%= render "video_tasks/trimmer", form: form, operation: @operation, video_task: @video_task %>
+    <% @operation.fields.reject { |f| %i[start end].include?(f.name) }.each do |field| %>
+      <%= render "video_tasks/field", field: field, video_task: @video_task %>
+    <% end %>
+  <% else %>
+    <div class="field">
+      <%= form.label :source, "Arquivo de vídeo" %>
+      <%= form.file_field :source, accept: "video/*", required: true %>
+    </div>
+    <% @operation.fields.each do |field| %>
+      <%= render "video_tasks/field", field: field, video_task: @video_task %>
+    <% end %>
+  <% end %>
+
+  <%= form.submit "Processar", class: "btn btn--primary" %>
+<% end %>

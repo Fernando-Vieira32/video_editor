@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  video-editor:
+    build: .
+    command: bash -c "bundle check || bundle install && rm -f tmp/pids/server.pid && bin/dev -b 0.0.0.0"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db      
+    environment:
+      RAILS_ENV: development
+      POSTGRES_HOST: db
+      POSTGRES_DB_NAME: video_editor_development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+  db:
+    image: postgres:16.6-alpine
+    container_name: video-editor-postgres-16.6
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+volumes:
+  postgres_data:  
+  bundle_cache:

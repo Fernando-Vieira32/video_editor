@@ -1,0 +1,30 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "db" } %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+  database: <%= ENV.fetch("POSTGRES_DB_NAME") { "video_editor_development" } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "postgres" } %>
+  
+
+
+development:
+  <<: *default
+  database: video_editor_development
+
+ 
+test:
+  <<: *default
+  database: video_editor_test
+
+#
+production:
+  primary: &primary_production
+    <<: *default
+    database: video_editor_production
+    username: morphos
+    password: <%= ENV["MORPHOS_DATABASE_PASSWORD"] %>
+

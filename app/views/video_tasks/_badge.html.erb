@@ -1,0 +1,2 @@
+<% labels = { "pending" => "Na fila", "processing" => "Processando", "completed" => "Concluído", "failed" => "Falhou" } %>
+<span class="badge badge--<%= video_task.status %>"><%= labels[video_task.status] %></span>

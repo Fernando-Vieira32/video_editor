@@ -1,0 +1,10 @@
+<%= turbo_stream_from @video_task %>
+
+<section class="form-header">
+  <%= link_to "← Voltar", root_path, class: "back" %>
+  <h1><%= @video_task.label %></h1>
+</section>
+
+<div id="video_task_status">
+  <%= render "video_tasks/status", video_task: @video_task %>
+</div>

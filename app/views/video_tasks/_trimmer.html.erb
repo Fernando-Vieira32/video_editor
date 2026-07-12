@@ -1,0 +1,44 @@
+<div class="trimmer" data-controller="video-trimmer"
+     data-video-trimmer-mode-value="<%= operation.timeline_mode %>">
+
+  <div class="field">
+    <%= form.label :source, "Arquivo de vídeo" %>
+    <%= form.file_field :source, accept: "video/*", required: true,
+          data: { video_trimmer_target: "file", action: "change->video-trimmer#load" } %>
+  </div>
+
+  <div class="trimmer__stage" data-video-trimmer-target="stage" hidden>
+    <video class="trimmer__video" data-video-trimmer-target="video" playsinline></video>
+
+    <div class="trimmer__controls">
+      <button type="button" class="btn btn--ghost" data-action="video-trimmer#togglePlay"
+              data-video-trimmer-target="playButton">▶ Play</button>
+      <button type="button" class="btn btn--ghost" data-action="video-trimmer#markIn">⟤ Marcar início</button>
+      <button type="button" class="btn btn--ghost" data-action="video-trimmer#markOut">Marcar fim ⟥</button>
+      <label class="trimmer__preview">
+        <input type="checkbox" data-action="video-trimmer#togglePreview"> Preview do resultado
+      </label>
+    </div>
+
+    <div class="timeline" data-video-trimmer-target="timeline" data-action="click->video-trimmer#seek">
+      <div class="timeline__filmstrip" data-video-trimmer-target="filmstrip"></div>
+      <div class="timeline__selection" data-video-trimmer-target="selection"></div>
+      <div class="timeline__handle timeline__handle--in" data-video-trimmer-target="inHandle"
+           data-action="mousedown->video-trimmer#dragIn"></div>
+      <div class="timeline__handle timeline__handle--out" data-video-trimmer-target="outHandle"
+           data-action="mousedown->video-trimmer#dragOut"></div>
+      <div class="timeline__playhead" data-video-trimmer-target="playhead"></div>
+    </div>
+
+    <div class="trimmer__times">
+      <span>Trecho: <strong data-video-trimmer-target="inLabel">00:00:00.000</strong>
+        → <strong data-video-trimmer-target="outLabel">00:00:00.000</strong></span>
+      <span class="trimmer__duration" data-video-trimmer-target="durationLabel"></span>
+    </div>
+  </div>
+
+  <%= text_field_tag "video_task[params][start]", video_task.params&.dig("start"),
+        id: "video_task_params_start", data: { video_trimmer_target: "startField" }, hidden: true %>
+  <%= text_field_tag "video_task[params][end]", video_task.params&.dig("end"),
+        id: "video_task_params_end", data: { video_trimmer_target: "endField" }, hidden: true %>
+</div>

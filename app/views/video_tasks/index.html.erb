@@ -1,0 +1,38 @@
+<section class="hero">
+  <h1>🎬 Video Editor</h1>
+  <p>Escolha um recurso para começar.</p>
+</section>
+
+<section class="operations">
+  <% @operations.each do |operation| %>
+    <%= link_to new_video_task_path(operation: operation.key), class: "op-card" do %>
+      <span class="op-card__icon"><%= operation.icon %></span>
+      <span class="op-card__label"><%= operation.label %></span>
+      <span class="op-card__desc"><%= operation.description %></span>
+    <% end %>
+  <% end %>
+</section>
+
+<section class="history">
+  <div class="history__header">
+    <h2>Histórico</h2>
+    <% if @video_tasks.any? %>
+      <%= button_to "Limpar histórico", clear_video_tasks_path, method: :delete,
+            class: "btn btn--ghost",
+            data: { turbo_confirm: "Apagar todo o histórico? Os arquivos gerados serão removidos." } %>
+    <% end %>
+  </div>
+  <% if @video_tasks.any? %>
+    <ul class="task-list">
+      <% @video_tasks.each do |task| %>
+        <li>
+          <%= link_to task.label, video_task_path(task) %>
+          <%= render "video_tasks/badge", video_task: task %>
+          <span class="task-list__time"><%= l(task.created_at, format: :short) %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="empty">Nenhuma tarefa ainda.</p>
+  <% end %>
+</section>

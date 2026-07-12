@@ -1,0 +1,21 @@
+<% value = (video_task.params || {})[field.param_key] %>
+<% dom_id = "video_task_params_#{field.name}" %>
+
+<% if field.type == :boolean %>
+  <div class="field field--checkbox">
+    <label>
+      <%= check_box_tag "video_task[params][#{field.name}]", "1",
+            ActiveModel::Type::Boolean.new.cast(value), id: dom_id %>
+      <%= field.label %>
+    </label>
+  </div>
+<% else %>
+  <div class="field">
+    <%= label_tag dom_id, field.label %>
+    <%= text_field_tag "video_task[params][#{field.name}]", value || field.default,
+          id: dom_id, placeholder: field.placeholder, required: field.required %>
+    <% if field.hint.present? %>
+      <small class="hint"><%= field.hint %></small>
+    <% end %>
+  </div>
+<% end %>

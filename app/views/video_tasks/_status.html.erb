@@ -1,0 +1,15 @@
+<div class="status-card status-card--<%= video_task.status %>">
+  <%= render "video_tasks/badge", video_task: video_task %>
+
+  <% if video_task.completed? %>
+    <p>Pronto! Seu arquivo foi gerado.</p>
+    <%= link_to "⬇ Baixar resultado",
+          rails_blob_path(video_task.result, disposition: "attachment"),
+          class: "btn btn--primary" %>
+  <% elsif video_task.failed? %>
+    <p>Ocorreu um erro ao processar:</p>
+    <pre class="error-log"><%= video_task.error_message %></pre>
+  <% else %>
+    <p class="processing-note">Processando… esta página atualiza sozinha quando terminar.</p>
+  <% end %>
+</div>
